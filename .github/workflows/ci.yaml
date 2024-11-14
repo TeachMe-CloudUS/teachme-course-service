@@ -1,0 +1,44 @@
+name: TeachMe CI
+
+# Ejecutar el workflow en cada push o pull request en la rama main
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build with Maven
+        shell: bash           # Usa Bash en lugar de PowerShell
+        run: |
+          cd teacher
+          mvn -B clean install
+
+      - name: Run tests
+        shell: bash           # Usa Bash en lugar de PowerShell
+        run: |
+          cd teacher
+          mvn test
