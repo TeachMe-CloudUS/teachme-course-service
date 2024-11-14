@@ -34,11 +34,11 @@ jobs:
       - name: Build with Maven
         shell: bash           # Usa Bash en lugar de PowerShell
         run: |
-          cd teacher
+          cd courseservice
           mvn -B clean install
 
       - name: Run tests
         shell: bash           # Usa Bash en lugar de PowerShell
         run: |
-          cd teacher
+          cd courseservice
           mvn test
