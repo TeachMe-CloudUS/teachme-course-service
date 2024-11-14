@@ -1,4 +1,4 @@
-package java.us.cloud.teachme.courseservice;
+package us.cloud.teachme.courseservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

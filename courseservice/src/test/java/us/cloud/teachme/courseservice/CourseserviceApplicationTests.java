@@ -1,4 +1,4 @@
-package java.us.cloud.teachme.courseservice;
+package us.cloud.teachme.courseservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
