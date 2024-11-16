@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import us.cloud.teachme.courseservice.model.Course;
 import us.cloud.teachme.courseservice.service.CourseService;
 
@@ -45,14 +46,14 @@ public class CourseController {
 
     // POST /api/courses - Crea un nuevo curso
     @PostMapping
-    public ResponseEntity<Course> createCourse(@RequestBody Course course) {
+    public ResponseEntity<Course> createCourse(@Valid @RequestBody Course course) {
         Course createdCourse = courseService.createCourse(course);
         return new ResponseEntity<>(createdCourse, HttpStatus.CREATED);
     }
 
     // PUT /api/courses/{id} - Actualiza un curso existente
     @PutMapping("/{id}")
-    public ResponseEntity<Course> updateCourse(@PathVariable String id, @RequestBody Course course) {
+    public ResponseEntity<Course> updateCourse( @PathVariable String id, @Valid @RequestBody Course course) {
         try {
             Course updatedCourse = courseService.updateCourse(id, course);
             return ResponseEntity.ok(updatedCourse);

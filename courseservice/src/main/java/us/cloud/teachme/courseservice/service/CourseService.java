@@ -27,10 +27,16 @@ public class CourseService {
 
     public Course createCourse(Course course) {
         course.setCreationDate(new Date());
+        if (courseRepository.existsByName(course.getName())) {
+            throw new IllegalArgumentException("A course with the same name already exists");
+        }
         return courseRepository.save(course);
     }
 
     public Course updateCourse(String id, Course updatedCourse) {
+        if (courseRepository.existsByName(updatedCourse.getName())) {
+            throw new IllegalArgumentException("A course with the same name already exists");
+        }
         return courseRepository.findById(id).map(course -> {
             course.setName(updatedCourse.getName());
             course.setDescription(updatedCourse.getDescription());
