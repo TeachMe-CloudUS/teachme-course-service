@@ -17,13 +17,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import us.cloud.teachme.courseservice.model.Course;
+import us.cloud.teachme.courseservice.model.Video;
 import us.cloud.teachme.courseservice.service.CourseService;
+import us.cloud.teachme.courseservice.service.VideoService;
 
 @RestController
 @RequestMapping("/api/courses")
 public class CourseController {
+    private final VideoService videoService;
+    private final CourseService courseService;
+
     @Autowired
-    private CourseService courseService;
+    public CourseController(VideoService videoService, CourseService courseService) {
+        this.videoService = videoService;
+        this.courseService = courseService;
+    }
 
     // GET /api/courses - Obtiene todos los cursos
     @GetMapping
@@ -46,14 +54,19 @@ public class CourseController {
 
     // POST /api/courses - Crea un nuevo curso
     @PostMapping
-    public ResponseEntity<Course> createCourse(@Valid @RequestBody Course course) {
-        Course createdCourse = courseService.createCourse(course);
-        return new ResponseEntity<>(createdCourse, HttpStatus.CREATED);
+    public ResponseEntity<?> createCourse(@RequestBody Course course) {
+        List<Video> videos = videoService.searchVideos(course.getDescription());
+        if (videos.isEmpty()) {
+            return ResponseEntity.badRequest().body("No se encontraron videos relacionados con el curso.");
+        }
+        course.setAdditionalResources(videos);
+        Course savedCourse = courseService.createCourse(course);
+        return ResponseEntity.ok(savedCourse);
     }
 
     // PUT /api/courses/{id} - Actualiza un curso existente
     @PutMapping("/{id}")
-    public ResponseEntity<Course> updateCourse( @PathVariable String id, @Valid @RequestBody Course course) {
+    public ResponseEntity<Course> updateCourse(@PathVariable String id, @Valid @RequestBody Course course) {
         try {
             Course updatedCourse = courseService.updateCourse(id, course);
             return ResponseEntity.ok(updatedCourse);
