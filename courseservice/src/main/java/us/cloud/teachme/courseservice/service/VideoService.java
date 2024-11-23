@@ -5,22 +5,22 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import org.springframework.beans.factory.annotation.Value;
 
 import us.cloud.teachme.courseservice.model.Video;
 
 @Service
 public class VideoService {
+    @Autowired
     private final WebClient webClient;
 
     @Value("${youtube.api.key}")
     private String apiKey;
 
-    @Autowired
+
     public VideoService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl("https://www.googleapis.com/youtube/v3").build();
     }
