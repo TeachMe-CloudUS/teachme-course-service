@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import us.cloud.teachme.courseservice.model.Course;
 import us.cloud.teachme.courseservice.repository.CourseRepository;
+
 @Service
 public class CourseService {
     @Autowired
@@ -21,6 +22,7 @@ public class CourseService {
     public Optional<Course> getCourseById(String id) {
         return courseRepository.findById(id);
     }
+
     public List<Course> getCoursesByCategory(String category) {
         return courseRepository.findByCategory(category);
     }
@@ -56,6 +58,4 @@ public class CourseService {
         }
     }
 
-
-    
 }
