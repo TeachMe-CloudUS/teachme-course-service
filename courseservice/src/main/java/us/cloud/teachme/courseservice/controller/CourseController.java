@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.Valid;
 import us.cloud.teachme.courseservice.model.Course;
 import us.cloud.teachme.courseservice.model.Video;
@@ -57,6 +58,7 @@ public class CourseController {
 
     // POST /api/courses - Crea un nuevo curso
     @PostMapping
+    @CircuitBreaker(name = "createCourse", fallbackMethod = "controllerFallback")
     public ResponseEntity<?> createCourse(@RequestBody Course course) {
         List<Video> videos = videoService.searchVideos(course.getDescription());
         if (videos.isEmpty()) {
@@ -65,6 +67,11 @@ public class CourseController {
         course.setAdditionalResources(videos);
         Course savedCourse = courseService.createCourse(course);
         return ResponseEntity.ok(savedCourse);
+    }
+
+    public ResponseEntity<String> controllerFallback(Throwable throwable) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                             .body("Fallback Circuit Breaker Activo: " + throwable.getMessage());
     }
 
     // PUT /api/courses/{id} - Actualiza un curso existente
