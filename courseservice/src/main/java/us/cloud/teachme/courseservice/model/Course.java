@@ -32,7 +32,7 @@ public class Course {
     private Date lastModifDate;
     @NotNull(message = "The level is mandatory")
     private Level level;
-
     private List<Video> additionalResources;
+    private Double rating;
 
 }

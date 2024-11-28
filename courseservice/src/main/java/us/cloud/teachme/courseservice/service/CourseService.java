@@ -50,6 +50,16 @@ public class CourseService {
         }).orElseThrow(() -> new RuntimeException("Course not found with id " + id));
     }
 
+    public Course actualizarRating(String id, double nuevoRating) {
+        Optional<Course> CourseOptional = courseRepository.findById(id);
+        if (CourseOptional.isPresent()) {
+            Course Course = CourseOptional.get();
+            Course.setRating(nuevoRating);  // Actualizar el atributo
+            return courseRepository.save(Course);  // Guardar los cambios
+        }
+        return null;  // Si no existe el curso
+    }
+
     public void deleteCourse(String id) {
         if (courseRepository.existsById(id)) {
             courseRepository.deleteById(id);

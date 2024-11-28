@@ -1,11 +1,14 @@
 package us.cloud.teachme.courseservice.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -72,6 +75,29 @@ public class CourseController {
             return ResponseEntity.ok(updatedCourse);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("/{id}/rating")
+    public ResponseEntity<Course> updateRating(@PathVariable String id, @RequestBody Map<String, Object> updates) {
+        if (!updates.containsKey("rating")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        try {
+            double nuevoRating = ((Number) updates.get("rating")).doubleValue();
+            if (nuevoRating < 0 || nuevoRating > 10) {
+                return ResponseEntity.badRequest().body(null);
+            }
+
+            Course cursoActualizado = courseService.actualizarRating(id, nuevoRating);
+            if (cursoActualizado == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(cursoActualizado);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
