@@ -61,25 +61,38 @@ public class CourseController {
     }
 
     // POST /api/courses - Crea un nuevo curso
-    @CircuitBreaker(name = "createCourse", fallbackMethod = "controllerFallback")
     @PostMapping
+    @CircuitBreaker(name = "createCourse", fallbackMethod = "controllerFallback")
     public ResponseEntity<?> createCourse(@RequestHeader("Authorization") String token, @RequestBody Course course) {
+            // Eliminar cualquier espacio extra del token
+        token = token.trim();
 
+            // Extraer el UserId del token
         String userId = userService.extractUserId(token);
+        System.out.println("UserId extraído: " + userId);
 
-        String rol = userService.getUserRoleById(userId);
+            // Consultar el rol del usuario usando el UserId
+        String role = userService.getUserRoleById(userId, token);
+        System.out.println("Rol del usuario: " + role);
 
-        if (!"ADMIN".equals(rol)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permisos para crear cursos");
+            // Verificar si el usuario tiene el rol de "ADMIN"
+        if (!"ADMIN".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permisos para crear cursos.");
         }
+
+            // Si todo es válido, continuar con la creación del curso
         List<Video> videos = videoService.searchVideos(course.getDescription());
         if (videos.isEmpty()) {
             return ResponseEntity.badRequest().body("No se encontraron videos relacionados con el curso.");
         }
+
+            // Guardar el curso
         course.setAdditionalResources(videos);
         Course savedCourse = courseService.createCourse(course);
         return ResponseEntity.ok(savedCourse);
+
     }
+
 
     public ResponseEntity<String> controllerFallback(Throwable throwable) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
@@ -88,8 +101,21 @@ public class CourseController {
 
     // PUT /api/courses/{id} - Actualiza un curso existente
     @PutMapping("/{id}")
-    public ResponseEntity<Course> updateCourse(@PathVariable String id, @Valid @RequestBody Course course) {
+    public ResponseEntity<?> updateCourse(@RequestHeader("Authorization") String token, @PathVariable String id, @Valid @RequestBody Course course) {
         try {
+            token = token.trim();
+
+            // Extraer el UserId del token
+            String userId = userService.extractUserId(token);
+            System.out.println("UserId extraído: " + userId);
+
+            // Consultar el rol del usuario usando el UserId
+            String role = userService.getUserRoleById(userId, token);
+            System.out.println("Rol del usuario: " + role);
+
+            if (!"ADMIN".equals(role)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permisos para actualizar cursos.");
+            }
             Course updatedCourse = courseService.updateCourse(id, course);
             return ResponseEntity.ok(updatedCourse);
         } catch (RuntimeException e) {
@@ -122,8 +148,21 @@ public class CourseController {
 
     // DELETE /api/courses/{id} - Elimina un curso por ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCourse(@PathVariable String id) {
+    public ResponseEntity<?> deleteCourse(@RequestHeader("Authorization") String token, @PathVariable String id) {
         try {
+            token = token.trim();
+
+            // Extraer el UserId del token
+            String userId = userService.extractUserId(token);
+            System.out.println("UserId extraído: " + userId);
+
+            // Consultar el rol del usuario usando el UserId
+            String role = userService.getUserRoleById(userId, token);
+            System.out.println("Rol del usuario: " + role);
+
+            if (!"ADMIN".equals(role)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permisos para eliminar cursos.");
+            }
             courseService.deleteCourse(id);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {

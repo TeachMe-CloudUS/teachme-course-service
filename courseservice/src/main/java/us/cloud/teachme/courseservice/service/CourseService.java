@@ -36,12 +36,8 @@ public class CourseService {
     }
 
     public Course updateCourse(String id, Course updatedCourse) {
-        if (courseRepository.existsByName(updatedCourse.getName())) {
-            throw new IllegalArgumentException("A course with the same name already exists");
-        }
+
         return courseRepository.findById(id).map(course -> {
-            course.setName(updatedCourse.getName());
-            course.setDescription(updatedCourse.getDescription());
             course.setCategory(updatedCourse.getCategory());
             course.setDuration(updatedCourse.getDuration());
             course.setLastModifDate(new Date());
