@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +22,7 @@ import jakarta.validation.Valid;
 import us.cloud.teachme.courseservice.model.Course;
 import us.cloud.teachme.courseservice.model.Video;
 import us.cloud.teachme.courseservice.service.CourseService;
+import us.cloud.teachme.courseservice.service.UserService;
 import us.cloud.teachme.courseservice.service.VideoService;
 
 @RestController
@@ -30,10 +32,12 @@ public class CourseController {
     @Autowired
     private final VideoService videoService;
     private final CourseService courseService;
+    private final UserService userService;
 
-    public CourseController(VideoService videoService, CourseService courseService) {
+    public CourseController(VideoService videoService, CourseService courseService, UserService userService) {
         this.videoService = videoService;
         this.courseService = courseService;
+        this.userService = userService;
     }
 
     // GET /api/courses - Obtiene todos los cursos
@@ -57,7 +61,15 @@ public class CourseController {
 
     // POST /api/courses - Crea un nuevo curso
     @PostMapping
-    public ResponseEntity<?> createCourse(@RequestBody Course course) {
+    public ResponseEntity<?> createCourse(@RequestHeader("Authorization") String token, @RequestBody Course course) {
+
+        String userId = userService.extractUserId(token);
+
+        String rol = userService.getUserRoleById(userId);
+
+        if (!"ADMIN".equals(rol)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permisos para crear cursos");
+        }
         List<Video> videos = videoService.searchVideos(course.getDescription());
         if (videos.isEmpty()) {
             return ResponseEntity.badRequest().body("No se encontraron videos relacionados con el curso.");
