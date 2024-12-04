@@ -27,6 +27,7 @@ public class VideoService {
 
     public List<Video> searchVideos(String query) {
         String uri = String.format("/search?part=snippet&q=%s&type=video&key=%s&maxResults=5", query, apiKey);
+        //String uri = String.format("/uri-pocha", query, apiKey);
 
         Map<String, Object> response = webClient.get()
                 .uri(uri)
