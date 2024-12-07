@@ -1,28 +1,19 @@
 package us.cloud.teachme.courseservice.controller;
 
-import java.util.List;
-import java.util.Map;
-
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 import us.cloud.teachme.courseservice.model.Course;
 import us.cloud.teachme.courseservice.model.Video;
 import us.cloud.teachme.courseservice.service.CourseService;
 import us.cloud.teachme.courseservice.service.VideoService;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/courses")
@@ -56,6 +47,14 @@ public class CourseController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/list")
+    public ResponseEntity<List<Course>> getCoursesById(@RequestBody List<String> courseIds) {
+        return ResponseEntity.ok(
+                courseIds.stream().map(
+                                courseId -> courseService.getCourseById(courseId).orElse(null))
+                        .collect(Collectors.toList()));
+    }
+
     // POST /api/courses - Crea un nuevo curso
     @PostMapping
     @CircuitBreaker(name = "createCourse", fallbackMethod = "controllerFallback")
@@ -71,7 +70,7 @@ public class CourseController {
 
     public ResponseEntity<String> controllerFallback(Throwable throwable) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                             .body("Fallback Circuit Breaker Activo: " + throwable.getMessage());
+                .body("Fallback Circuit Breaker Activo: " + throwable.getMessage());
     }
 
     // PUT /api/courses/{id} - Actualiza un curso existente
