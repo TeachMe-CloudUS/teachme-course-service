@@ -2,6 +2,7 @@ package us.cloud.teachme.courseservice.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -60,6 +61,14 @@ public class CourseController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/list")
+    public ResponseEntity<List<Course>> getCoursesById(@RequestBody List<String> courseIds) {
+        return ResponseEntity.ok(
+                courseIds.stream().map(
+                                courseId -> courseService.getCourseById(courseId).orElse(null))
+                        .collect(Collectors.toList()));
+    }
+
     // POST /api/courses - Crea un nuevo curso
     @PostMapping
     @CircuitBreaker(name = "createCourse", fallbackMethod = "controllerFallback")
@@ -96,7 +105,7 @@ public class CourseController {
 
     public ResponseEntity<String> controllerFallback(Throwable throwable) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                             .body("Fallback Circuit Breaker Activo: " + throwable.getMessage());
+                .body("Fallback Circuit Breaker Activo: " + throwable.getMessage());
     }
 
     // PUT /api/courses/{id} - Actualiza un curso existente
