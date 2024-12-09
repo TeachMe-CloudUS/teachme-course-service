@@ -178,4 +178,10 @@ public class CourseController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @DeleteMapping("/clear-all")
+    public ResponseEntity<String> clearAllCache() {
+        videoService.clearAllCache();
+        return ResponseEntity.ok("Toda la caché ha sido limpiada.");
+    }
 }
