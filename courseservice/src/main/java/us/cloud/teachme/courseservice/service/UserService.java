@@ -4,6 +4,7 @@ import java.util.Base64;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -16,8 +17,11 @@ public class UserService {
     @Autowired
     private WebClient.Builder webClientBuilder;
 
+    @Value("$base.url")
+    private String baseUrl;
+
     public String getUserRoleById(String userId, String token) {
-        String url = "http://localhost:8085/api/v1/user/" + userId;
+        String url = baseUrl + userId;
         try {
             JsonNode userNode = webClientBuilder.build()
                 .get()

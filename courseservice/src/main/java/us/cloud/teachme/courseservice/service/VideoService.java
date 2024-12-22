@@ -22,7 +22,7 @@ public class VideoService {
     @Value("${youtube.api.key}")
     private String apiKey;
 
-
+    
     public VideoService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl("https://www.googleapis.com/youtube/v3").build();
     }
