@@ -44,8 +44,9 @@ public class CourseController {
 
     // GET /api/courses - Obtiene todos los cursos
     @GetMapping
-    public List<Course> getAllCourses() {
-        return courseService.getAllCourses();
+    public ResponseEntity<List<Course>> getAllCourses() {
+        List<Course> courses = courseService.getAllCourses();
+        return ResponseEntity.ok(courses);
     }
 
     @GetMapping("/filter")
@@ -65,7 +66,7 @@ public class CourseController {
     public ResponseEntity<List<Course>> getCoursesById(@RequestBody List<String> courseIds) {
         return ResponseEntity.ok(
                 courseIds.stream().map(
-                                courseId -> courseService.getCourseById(courseId).orElse(null))
+                        courseId -> courseService.getCourseById(courseId).orElse(null))
                         .collect(Collectors.toList()));
     }
 
@@ -73,35 +74,34 @@ public class CourseController {
     @PostMapping
     @CircuitBreaker(name = "createCourse", fallbackMethod = "controllerFallback")
     public ResponseEntity<?> createCourse(@RequestHeader("Authorization") String token, @RequestBody Course course) {
-            // Eliminar cualquier espacio extra del token
+        // Eliminar cualquier espacio extra del token
         token = token.trim();
 
-            // Extraer el UserId del token
+        // Extraer el UserId del token
         String userId = userService.extractUserId(token);
         System.out.println("UserId extraído: " + userId);
 
-            // Consultar el rol del usuario usando el UserId
+        // Consultar el rol del usuario usando el UserId
         String role = userService.getUserRoleById(userId, token);
         System.out.println("Rol del usuario: " + role);
 
-            // Verificar si el usuario tiene el rol de "ADMIN"
+        // Verificar si el usuario tiene el rol de "ADMIN"
         if (!"ADMIN".equals(role)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permisos para crear cursos.");
         }
 
-            // Si todo es válido, continuar con la creación del curso
+        // Si todo es válido, continuar con la creación del curso
         List<Video> videos = videoService.searchVideos(course.getDescription());
         if (videos.isEmpty()) {
             return ResponseEntity.badRequest().body("No se encontraron videos relacionados con el curso.");
         }
 
-            // Guardar el curso
+        // Guardar el curso
         course.setAdditionalResources(videos);
         Course savedCourse = courseService.createCourse(course);
         return ResponseEntity.ok(savedCourse);
 
     }
-
 
     public ResponseEntity<String> controllerFallback(Throwable throwable) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
@@ -110,7 +110,8 @@ public class CourseController {
 
     // PUT /api/courses/{id} - Actualiza un curso existente
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCourse(@RequestHeader("Authorization") String token, @PathVariable String id, @Valid @RequestBody Course course) {
+    public ResponseEntity<?> updateCourse(@RequestHeader("Authorization") String token, @PathVariable String id,
+            @Valid @RequestBody Course course) {
         try {
             token = token.trim();
 
