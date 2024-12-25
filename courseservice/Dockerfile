@@ -25,4 +25,4 @@ RUN --mount=type=secret,id=maven_settings,target=/root/.m2/settings.xml \
 
 EXPOSE 8080
 
-ENTRYPOINT ["mvn", "spring-boot:run"]
+ENTRYPOINT ["mvn", "spring-boot:run", "-X"]
