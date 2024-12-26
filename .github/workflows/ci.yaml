@@ -31,14 +31,29 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      - name: Set environment variables
+        env:
+          MONGODB_URI: 'tu_mongodb_uri_aqui'
+          YOUTUBE_API_KEY: 'tu_youtube_api_key_aqui'
+          BASE_URL: 'tu_base_url_aqui'
+        run: echo "Variables de entorno configuradas."
+
       - name: Build with Maven
         shell: bash           # Usa Bash en lugar de PowerShell
         run: |
           cd courseservice
           mvn -B clean install
+        env:
+          MONGODB_URI: 'mongodb+srv://pedlopruz2002:pedlopruz2002@clusterprueba.7ave6.mongodb.net/MicroservicioPrueba?retryWrites=true&w=majority&appName=ClusterPrueba'
+          YOUTUBE_API_KEY: 'AIzaSyCDnU3Y2hvGZWhJQ41I36MrtaCGSBqQFNU'
+          BASE_URL: 'http://localhost:8085/api/v1/users/'
 
       - name: Run tests
         shell: bash           # Usa Bash en lugar de PowerShell
         run: |
           cd courseservice
           mvn test
+        env:
+          MONGODB_URI: 'mongodb+srv://pedlopruz2002:pedlopruz2002@clusterprueba.7ave6.mongodb.net/MicroservicioPrueba?retryWrites=true&w=majority&appName=ClusterPrueba'
+          YOUTUBE_API_KEY: 'AIzaSyCDnU3Y2hvGZWhJQ41I36MrtaCGSBqQFNU'
+          BASE_URL: 'http://localhost:8085/api/v1/users/'
