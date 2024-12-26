@@ -22,7 +22,7 @@ public class VideoService {
     @Value("${youtube.api.key}")
     private String apiKey;
 
-    
+    @Autowired
     public VideoService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.baseUrl("https://www.googleapis.com/youtube/v3").build();
     }
@@ -30,7 +30,7 @@ public class VideoService {
     @Cacheable(value = "videosCache", key = "#query")
     public List<Video> searchVideos(String query) {
         String uri = String.format("/search?part=snippet&q=%s&type=video&key=%s&maxResults=5", query, apiKey);
-        //String uri = String.format("/uri-pocha", query, apiKey);
+        // String uri = String.format("/uri-pocha", query, apiKey);
 
         Map<String, Object> response = webClient.get()
                 .uri(uri)
@@ -54,13 +54,14 @@ public class VideoService {
                 })
                 .collect(Collectors.toList());
     }
+
     @CacheEvict(value = "videosCache", key = "#query")
     public void clearCache(String query) {
-    // Limpia la caché para la consulta específica
+        // Limpia la caché para la consulta específica
     }
 
     @CacheEvict(value = "videosCache", allEntries = true)
     public void clearAllCache() {
-    // Limpia toda la caché
+        // Limpia toda la caché
     }
 }
