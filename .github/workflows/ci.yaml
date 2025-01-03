@@ -1,3 +1,14 @@
+name: TeachMe CI
+
+# Ejecutar el workflow en cada push o pull request en la rama main
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
   build:
     runs-on: ubuntu-latest  # Cambiado de windows-latest a ubuntu-latest
