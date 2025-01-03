@@ -72,12 +72,16 @@ public class CourseService {
     
 
     public Course updateCourse(String id, Course updatedCourse) {
-
         return courseRepository.findById(id).map(course -> {
+            // Usar valores existentes si no se proporcionan
+            // Actualizar los demás campos
+            course.setName(course.getName());
+            course.setDescription(course.getDescription());
             course.setCategory(updatedCourse.getCategory());
             course.setDuration(updatedCourse.getDuration());
             course.setLastModifDate(new Date());
             course.setLevel(updatedCourse.getLevel());
+    
             return courseRepository.save(course);
         }).orElseThrow(() -> new RuntimeException("Course not found with id " + id));
     }
