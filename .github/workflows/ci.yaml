@@ -1,17 +1,6 @@
-name: TeachMe CI
-
-# Ejecutar el workflow en cada push o pull request en la rama main
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest  # Cambiado de windows-latest a ubuntu-latest
 
     steps:
       - name: Check out the code
@@ -39,7 +28,7 @@ jobs:
         run: echo "Variables de entorno configuradas."
 
       - name: Build with Maven
-        shell: bash           # Usa Bash en lugar de PowerShell
+        shell: bash
         run: |
           cd courseservice
           mvn -B clean install
@@ -51,7 +40,7 @@ jobs:
           FORUM_DELETE_URL: 'http://localhost:8085/api/v1/users/'
 
       - name: Run tests
-        shell: bash           # Usa Bash en lugar de PowerShell
+        shell: bash
         run: |
           cd courseservice
           mvn test
