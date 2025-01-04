@@ -126,7 +126,12 @@ public class CourseController {
             if (!"ADMIN".equals(role)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permisos para actualizar cursos.");
             }
+            List<Video> videos = videoService.searchVideos(course.getDescription());
+            if (videos.isEmpty()) {
+                return ResponseEntity.badRequest().body("No se encontraron videos relacionados con el curso.");
+            }
             Course updatedCourse = courseService.updateCourse(id, course);
+            updatedCourse.setAdditionalResources(videos);
             return ResponseEntity.ok(updatedCourse);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

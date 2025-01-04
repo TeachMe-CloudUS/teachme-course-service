@@ -71,6 +71,12 @@ public class CourseService {
 
     public Course updateCourse(String id, Course updatedCourse) {
         return courseRepository.findById(id).map(course -> {
+            if (updatedCourse.getName() != null) {
+                course.setName(updatedCourse.getName());
+            }
+            if (updatedCourse.getDescription() != null) {
+                course.setDescription(updatedCourse.getDescription());
+            }
             if (updatedCourse.getCategory() != null) {
                 course.setCategory(updatedCourse.getCategory());
             }
@@ -81,7 +87,15 @@ public class CourseService {
             if (updatedCourse.getLevel() != null) {
                 course.setLevel(updatedCourse.getLevel());
             }
-
+    
+            // Validar campos obligatorios antes de guardar
+            if (course.getName() == null || course.getName().isBlank()) {
+                throw new RuntimeException("Course name is mandatory");
+            }
+            if (course.getDescription() == null || course.getDescription().isBlank()) {
+                throw new RuntimeException("Course description is mandatory");
+            }
+    
             return courseRepository.save(course);
         }).orElseThrow(() -> new RuntimeException("Course not found with id " + id));
     }
