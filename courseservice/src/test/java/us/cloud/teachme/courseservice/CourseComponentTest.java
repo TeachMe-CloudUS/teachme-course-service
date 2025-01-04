@@ -250,12 +250,18 @@ public class CourseComponentTest {
         updatedCourse.setAdditionalResources(List.of());
         updatedCourse.setRating(4.8);
 
+        Video video = new Video();
+        video.setTitle("Video 1");
+        video.setDescription("Video 1 description");
+        video.setUrl("https://example.com/video1");
+
 
         Mockito.when(userService.extractUserId(Mockito.anyString())).thenReturn("adminUserId");
         Mockito.when(userService.getUserRoleById(Mockito.eq("adminUserId"), Mockito.anyString())).thenReturn("ADMIN");
 
         Mockito.when(courseService.updateCourse(Mockito.eq("1"), Mockito.any(Course.class)))
                 .thenReturn(updatedCourse);
+        Mockito.when(videoService.searchVideos(Mockito.anyString())).thenReturn(List.of(video));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/courses/{id}", "1")
                         .header("Authorization", token)
@@ -309,6 +315,11 @@ public class CourseComponentTest {
         updatedCourse.setDuration("15h");
         updatedCourse.setLevel(Level.ADVANCE);
 
+        Video video = new Video();
+        video.setTitle("Video 1");
+        video.setDescription("Video 1 description");
+        video.setUrl("https://example.com/video1");
+
         // Mock del servicio de usuario: usuario con rol `ADMIN`
         Mockito.when(userService.extractUserId(Mockito.anyString())).thenReturn("adminUserId");
         Mockito.when(userService.getUserRoleById(Mockito.eq("adminUserId"), Mockito.anyString())).thenReturn("ADMIN");
@@ -316,6 +327,7 @@ public class CourseComponentTest {
         // Mock del servicio de curso: ID inexistente lanza una excepción
         Mockito.when(courseService.updateCourse(Mockito.eq("999"), Mockito.any(Course.class)))
                 .thenThrow(new RuntimeException("Course not found with ID 999"));
+        Mockito.when(videoService.searchVideos(Mockito.anyString())).thenReturn(List.of(video));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/courses/{id}", "999")
                         .header("Authorization", token)
